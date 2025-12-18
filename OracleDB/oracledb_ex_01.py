@@ -17,8 +17,11 @@ Step-6: Every Python Program is Recommned to Close the Connection from Database 
 
 import oracledb as orc # Step-1
 try:
-    conobj=orc.connect("system/tiger@localhost/orcl")
+    conobj=orc.connect("system/tiger@localhost/orcl") #step-2
     print("Python Program Got Connection from Oracle Database")
     print("Type of conobj=",type(conobj))
 except orc.DatabaseError as db:
     print("\tProblem in Oracle db:", db)
+
+#=======================================================================================================================
+
