@@ -10,24 +10,14 @@ Step-5: Every Python Program Must Process the Result of the Query which is comin
 Step-6: Every Python Program is Recommned to Close the Connection from Database Software (Optional )
 ****************************************************************************************************'''
 
-import os
-import oracledb
-from dotenv import load_dotenv
-
-# This loads the variables from the .env file into Python
-load_dotenv()
-
-user = os.getenv(DB_USER)
-password = os.getenv(DB_PASS)
-dsn = os.getenv(DB_DSN)
-
-print(oracledb.__version__)
+# import oracledb
+# print(oracledb.__version__)
 
 #=======================================================================================================================
 
 import oracledb as orc # Step-1
 try:
-    conobj=orc.connect("system/tiger@127.0.0.1/orcl")
+    conobj=orc.connect("system/tiger@localhost/orcl")
     print("Python Program Got Connection from Oracle Database")
     print("Type of conobj=",type(conobj))
 except orc.DatabaseError as db:
