@@ -59,3 +59,23 @@ def tablecreate():
         print("Problem in Oracle:",db)
 #Main Program
 tablecreate() # Function Call
+
+#=======================================================================================================================
+
+#program for Inserting Record in Employee Table
+#OracleRecordInsertEx1.py
+import oracledb as orc # Step-1
+def recordinsert():
+    try:
+        con=orc.connect("system/tiger@localhost/orcl") #Step-2
+        cur=con.cursor() # Step-3
+        #Step-4
+        iq="insert into employee values(400,'Gosling',1.7,'SUNMS')"
+        cur.execute(iq)
+        con.commit()
+        #Step-5
+        print("Record Inserted in Employee Table--verify")
+    except orc.DatabaseError as db:
+        print("Problem in Oracle:",db)
+#Main Program
+recordinsert() # Function Call
