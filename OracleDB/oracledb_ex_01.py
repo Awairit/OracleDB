@@ -79,3 +79,32 @@ def recordinsert():
         print("Problem in Oracle:",db)
 #Main Program
 recordinsert() # Function Call
+
+#=======================================================================================================================
+
+import oracledb
+
+# Establish a connection (autocommit is often False by default)
+connection = oracledb.connect('YOUR_CONNECTION_STRING')
+cursor = connection.cursor()
+
+try:
+    # Execute DML statements
+    cursor.execute("INSERT INTO employees (name, salary) VALUES (?, ?)", ('Sita', 50000))
+    cursor.execute("UPDATE departments SET budget = budget - 50000 WHERE id = ?", (12345,))
+
+    # Commit the transaction to save the changes permanently
+    connection.commit()
+    print("Transaction committed successfully.")
+
+except Exception as e:
+    # If any error occurs, roll back the transaction to discard changes
+    connection.rollback()
+    print(f"An error occurred, rolled back: {e}")
+
+finally:
+    # Close the cursor and connection in the finally block
+    if cursor:
+        cursor.close()
+    if connection:
+        connection.close()
