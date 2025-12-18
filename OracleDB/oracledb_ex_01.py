@@ -82,29 +82,56 @@ recordinsert() # Function Call
 
 #=======================================================================================================================
 
-import oracledb
+import oracledb #step-1
 
 # Establish a connection (autocommit is often False by default)
-connection = oracledb.connect('YOUR_CONNECTION_STRING')
-cursor = connection.cursor()
+connection_object = oracledb.connect('YOUR_CONNECTION_STRING') #step-2
+cursor_object = connection_object.cursor() # step-3
 
 try:
     # Execute DML statements
-    cursor.execute("INSERT INTO employees (name, salary) VALUES (?, ?)", ('Sita', 50000))
-    cursor.execute("UPDATE departments SET budget = budget - 50000 WHERE id = ?", (12345,))
+    cursor_object.execute("INSERT INTO employees (name, salary) VALUES (?, ?)", ('Sita', 50000)) #step-
+    cursor_object.execute("UPDATE departments SET budget = budget - 50000 WHERE id = ?", (12345,)) #step-4
 
     # Commit the transaction to save the changes permanently
-    connection.commit()
-    print("Transaction committed successfully.")
+    connection_object.commit() #step-5
+    print("Transaction committed successfully.") #step-6
 
 except Exception as e:
     # If any error occurs, roll back the transaction to discard changes
-    connection.rollback()
+    connection_object.rollback() #step-7
     print(f"An error occurred, rolled back: {e}")
 
 finally:
     # Close the cursor and connection in the finally block
-    if cursor:
-        cursor.close()
-    if connection:
-        connection.close()
+    if cursor_object:
+        cursor_object.close() #step-8
+    if connection_object:
+        connection_object.close() #step-9
+
+#=======================================================================================================================
+
+#program for Inserting Record in Employee Table
+#OracleRecordInsertEx2.py
+import oracledb as orc # Step-1
+def recordinsert():
+    try:
+        con=orc.connect("system/tiger@localhost/orcl") #Step-2
+        cur=con.cursor() # Step-3
+        #Accept the employee Values from Key Board
+        print("-----------------------------------------")
+        empno=int(input("Enter Employee Number:"))
+        empname = input("Enter Employee Name:")
+        empsal = float(input("Enter Employee Salary:"))
+        empcompname =input("Enter Employee Comp Name:")
+        print("-----------------------------------------")
+        #Step-4
+        iq="insert into employee values(%d,'%s',%f,'%s')" %(empno,empname,empsal,empcompname)
+        cur.execute(iq)
+        con.commit()
+        #Step-5
+        print("{} Record Inserted in Employee Table--verify".format(cur.rowcount))
+    except orc.DatabaseError as db:
+        print("Problem in Oracle:",db)
+#Main Program
+recordinsert() # Function Call
