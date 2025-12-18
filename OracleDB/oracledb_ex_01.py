@@ -40,3 +40,22 @@ try:
     print("-----------------------------------------------")
 except orc.DatabaseError as db:
     print("\tProblem in Oracle db:", db)
+
+#=======================================================================================================================
+
+#Program for Creating Table --employee
+#OracleTableCreateEx.py
+import oracledb as orc # Step-1
+def tablecreate():
+    try:
+        con=orc.connect("system/tiger@localhost/orcl") #Step-2
+        cur=con.cursor() # Step-3
+        #Step-4
+        tcq="create table employee(eno number(2) primary key,name varchar2(10) not null,sal number(5,2))"
+        cur.execute(tcq)
+        #Step-5
+        print("Table Created Sucessfully--verify")
+    except orc.DatabaseError as db:
+        print("Problem in Oracle:",db)
+#Main Program
+tablecreate() # Function Call
