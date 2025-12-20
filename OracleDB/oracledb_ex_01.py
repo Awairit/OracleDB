@@ -185,3 +185,95 @@ def recordupdate():
 # Main Program
 if __name__ == "__main__":
     recordupdate()
+
+#=======================================================================================================================
+
+import oracledb as orc
+
+def recordupdate_advanced():
+    con = None
+    try:
+        # Step-2: Establish connection
+        con = orc.connect("system/tiger@localhost:1521/orcl")
+        cur = con.cursor()
+
+        updated_count = 0
+        print("--- Bulk Update Mode Started ---")
+
+        while True:
+            print("\n" + "-" * 40)
+            try:
+                empno = int(input("Enter Employee Number to update: "))
+                empsal = float(input("Enter New Salary: "))
+                empcompname = input("Enter New Company Name: ")
+
+                # Step-4: Prepare the update in the buffer
+                uq = "update employee set sal=:1, cname=:2 where eno=:3"
+                cur.execute(uq, (empsal, empcompname, empno))
+
+                if cur.rowcount > 0:
+                    updated_count += cur.rowcount
+                    print(f"✔️ Update for ID {empno} prepared in memory.")
+                else:
+                    print(f"❌ Employee {empno} not found. No change prepared.")
+
+            except ValueError:
+                print("⚠️ Invalid input! Skipping this entry.")
+
+            print("-" * 40)
+            ch = input("Add another update to this transaction? (yes/no): ").strip().lower()
+            if ch == "no":
+                break
+
+        # --- STRATEGY A: Final Decision Point ---
+        if updated_count > 0:
+            print(f"\nSummary: {updated_count} updates are waiting to be saved.")
+            confirm = input("Confirm all changes? (yes to COMMIT / no to ROLLBACK): ").strip().lower()
+
+            if confirm == "yes":
+                con.commit()
+                print("✅ DATABASE UPDATED: All changes saved permanently.")
+            else:
+                con.rollback()
+                print("↩️ ROLLBACK EXECUTED: All changes discarded.")
+        else:
+            print("No updates were performed.")
+
+    # --- STRATEGY B: Graceful DB Error Handling ---
+    except orc.DatabaseError as db:
+        print("\n🔥 A Database Error Occurred!")
+        if con:
+            con.rollback()
+            print("↩️ Emergency Rollback performed to protect data integrity.")
+        print("Error Details:", db)
+
+    finally:
+        if con:
+            con.close()
+            print("\nOracle Connection Closed.")
+
+if __name__ == "__main__":
+    recordupdate_advanced()
+
+'''This script demonstrates a professional **PDBC transaction management** system using two specific strategies 
+to ensure data integrity.
+
+ 🚩 The Problem
+By default, every `execute()` call can be committed immediately, which is risky. If you have 10 updates and the 5th
+ fails, or you realize you made a typo, you can't undo the previous 4.
+
+ ✅ The Solution (Main Points)
+1.  **Buffered Execution:** The code calls `cur.execute()` inside the loop but **delays** `con.commit()`.
+ This keeps changes in a "pending" state in memory.
+ 
+2.  **Strategy A (Bulk Decision):** It uses a **Final Decision Point** outside the loop. 
+ This allows the user to review all changes as a single batch and either save all (**COMMIT**) 
+ or undo all (**ROLLBACK**) at once.
+ 
+3.  **Strategy B (Emergency Rollback):** The `except` block catches `orc.DatabaseError`. If the database crashes or 
+ a constraint is violated, it triggers an **automatic rollback** to prevent partial or corrupted data from being saved.
+ 
+4.  **Resource Safety:** The `finally` block ensures `con.close()` is always called, preventing connection leaks.
+'''
+
+#=======================================================================================================================
