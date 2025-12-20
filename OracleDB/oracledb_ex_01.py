@@ -135,3 +135,53 @@ def recordinsert():
         print("Problem in Oracle:",db)
 #Main Program
 recordinsert() # Function Call
+
+#=======================================================================================================================
+
+# Python 3.13.1 Interpreter (Simulated)
+# File: OracleRecordUpdateEx2_Fixed.py
+
+import oracledb as orc
+def recordupdate():
+    con = None
+    try:
+        # Step-2: Establish connection once for the session
+        con = orc.connect("system/tiger@localhost:1521/orcl")
+        cur = con.cursor()  # Step-3
+
+        while True:
+            print("\n-------------------------------------------------")
+            try:
+                empno = int(input("Enter Employee Number for updating: "))
+                empsal = float(input("Enter New Employee Salary: "))
+                empcompname = input("Enter New Employee Comp Name: ")
+
+                # Step-4: Using BIND VARIABLES for security and performance
+                # This prevents SQL Injection and formatting errors
+                uq = "update employee set sal=:1, cname=:2 where eno=:3"
+                cur.execute(uq, (empsal, empcompname, empno))
+
+                if cur.rowcount > 0:
+                    con.commit()  # Commit after a successful update
+                    print(f"✅ {cur.rowcount} Record Updated successfully.")
+                else:
+                    print("❌ Employee Number Does not Exist.")
+
+            except ValueError:
+                print("⚠️ Invalid Input! Please enter numeric values for ID and Salary.")
+            print("-------------------------------------------------")
+            ch = input("Do you want to update another record (yes/no): ").strip().lower()
+            if ch == "no":
+                print("Thx for Using this Program")
+                break
+
+    except orc.DatabaseError as db:
+        print("Problem in Oracle:", db)
+    finally:
+        # Step-5: Ensure connection is closed even if an error occurs
+        if con:
+            con.close()
+            print("Oracle Connection Closed.")
+# Main Program
+if __name__ == "__main__":
+    recordupdate()
